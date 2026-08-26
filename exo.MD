@@ -154,3 +154,117 @@ RETURNING *
 INSERT INTO rental_archive
 SELECT * FROM rental_tooOld;
 ```
+
+
+## Exercice 3.1 : Pratique de SELECT de base
+Dataset : Pagila
+Tâche 1 : Sélectionner tous les films en affichant uniquement le titre, l'année de sortie et le tarif de
+location
+
+```sql
+SELECT release_year, title, rental_rate FROM film;
+
+```
+
+Tâche 2 : Sélectionner les clients en affichant leur nom complet (prénom et nom combinés) et email en
+majuscules
+
+```sql
+SELECT last_name, first_name, UPPER(email) FROM customer;
+
+```
+
+Tâche 3 : Obtenir toutes les classifications de films uniques dans la base de données
+```sql
+SELECT DISTINCT rating FROM film;
+
+```
+
+## Exercice 3.2 : Pratique de la clause WHERE
+Dataset : Pagila
+Tâche 1 : Trouver tous les films classés 'R' avec un tarif de location supérieur à 3.00
+```sql
+SELECT * from film WHERE rating = 'R' AND rental_rate > 3;
+
+```
+
+Tâche 2 : Trouver les clients dont le nom de famille commence par 'S' (insensible à la casse)
+
+```sql
+SELECT * FROM customer WHERE last_name LIKE 'S%' OR last_name LIKE 's%';
+
+```
+Tâche 3 : Trouver les films entre 100 et 120 minutes, classés 'PG-13' ou 'R'
+```sql
+SELECT * FROM film WHERE length_hours BETWEEN 1.4 AND 2 AND rating IN ('PG-13','R');
+
+```
+
+## Exercice 3.3 : Tri et pagination
+Dataset : Pagila
+Tâche 1 : Obtenir les 10 films les plus chers à louer
+```sql
+SELECT title, rental_rate FROM film ORDER BY rental_rate DESC LIMIT 10;
+
+```
+
+Tâche 2 : Obtenir la page 3 des clients (20 par page), triés par nom de famille
+```sql
+SELECT * FROM customer ORDER BY last_name LIMIT 20 OFFSET 40;
+
+```
+
+Tâche 3 : Obtenir les 5 films les plus longs, mais exclure le plus long absolu (ignorer 1, obtenir 5)
+```sql
+SELECT * FROM film ORDER BY length_hours LIMIT 5 OFFSET 1;
+
+```
+
+## Exercice 3.4 : Pratique d'INNER JOIN
+Dataset : Pagila
+Tâche 1 : Lister tous les films avec leurs noms de catégorie
+```sql
+SELECT f.title, c.name 
+FROM film f
+JOIN film_category fc ON f.film_id = fc.film_id
+JOIN category c ON fc.category_id = c.category_id;
+
+```
+
+Tâche 2 : Trouver tous les paiements effectués par le client 'Mary Smith'
+```sql
+SELECT p.payment_date, p.amount, c.first_name, c.last_name
+FROM customer c
+JOIN payment p ON c.customer_id = p.customer_id;
+
+```
+
+Tâche 3 : Lister les films, leurs acteurs et catégories (jointure 3-voies via tables de jonction)
+```sql
+SELECT f.title, a.last_name, c.name
+FROM film f
+JOIN film_category fc ON f.film_id = fc.film_id
+JOIN category c ON fc.category_id = c.category_id
+JOIN film_actor fa ON f.film_id = fa.film_id
+JOIN actor a ON fa.actor_id = a.actor_id;
+
+```
+
+## Exercice 3.5 : Pratique des JOINs externes
+Dataset : Pagila
+Tâche 1 : Trouver tous les acteurs qui n'ont jamais joué dans un film
+```sql
+SELECT a.first_name, a.last_name
+FROM actor a
+LEFT JOIN film_actor fa ON a.actor_id = fa.actor_id
+WHERE fa.film_id = NULL;
+
+```
+Tâche 2 : Lister toutes les catégories avec leur nombre de films (y compris les catégories avec 0 film)
+```sql
+SELECT c.name, COUNT(fc.film_id)
+FROM category c
+JOIN film_category fc ON c.category_id = fc.category_id
+GROUP BY c.name;
+
+```
